@@ -15,7 +15,9 @@ public interface LeadRepository extends JpaRepository<Lead, Long> {
 
     List<Lead> findByKamIdAndStatus(Long kamId, Status status);
 
-    @Query("SELECT l FROM Lead l WHERE l.callFrequency IS NOT NULL " +
-            "AND (l.lastCallDate IS NULL OR DATEDIFF(CURRENT_DATE, l.lastCallDate) >= l.callFrequency)")
+    @Query("SELECT l FROM Lead l " +
+            "WHERE l.callFrequency IS NOT NULL " +
+            "AND (l.status = 'NEW' " +
+            "OR (l.status = 'CONTACTED' AND DATEDIFF(CURRENT_DATE, l.lastCallDate) >= l.callFrequency))")
     List<Lead> findLeadsRequiringCallToday(LocalDateTime now);
 }
