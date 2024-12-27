@@ -37,5 +37,9 @@ public class Interaction {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "poc_id")
+    private Poc poc;
+
 }
 

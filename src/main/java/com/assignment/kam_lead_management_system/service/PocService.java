@@ -48,6 +48,7 @@ public class PocService {
 
         return pocs.stream()
                 .map(poc -> PocResponseDTO.builder()
+                        .id(poc.getId())
                         .name(poc.getName())
                         .role(poc.getRole())
                         .email(poc.getEmail())

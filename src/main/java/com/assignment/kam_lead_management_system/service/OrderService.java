@@ -1,9 +1,6 @@
 package com.assignment.kam_lead_management_system.service;
 
-import com.assignment.kam_lead_management_system.domain.InteractionType;
-import com.assignment.kam_lead_management_system.domain.Kam;
-import com.assignment.kam_lead_management_system.domain.Lead;
-import com.assignment.kam_lead_management_system.domain.Order;
+import com.assignment.kam_lead_management_system.domain.*;
 import com.assignment.kam_lead_management_system.dto.InteractionRequestDTO;
 import com.assignment.kam_lead_management_system.dto.InteractionResponseDTO;
 import com.assignment.kam_lead_management_system.repository.LeadRepository;
@@ -33,6 +30,12 @@ public class OrderService {
 
             Kam kam = lead.getKam();
 
+            // Validate the POC and ensure it belongs to the given Lead
+            Poc poc = lead.getPocs().stream()
+                    .filter(p -> p.getId().equals(interactionRequestDTO.getPocId()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("POC is not associated with the lead"));
+
             // Only create an order if the interaction type is "Order"
             if (InteractionType.ORDER.equals(interactionRequestDTO.getType())) {
                 Order order = Order.builder()
@@ -45,15 +48,20 @@ public class OrderService {
 
                 orderRepository.save(order);
 
+                //convert the lead status to converted if order is placed
+                lead.setStatus(Status.CONVERTED);
+                leadRepository.save(lead);
+
                 // Convert the Order entity to OrderResponseDTO
                 interactionResponseDTO = InteractionResponseDTO.builder()
                         .id(order.getId())
                         .orderDetails(order.getOrderDetails())
                         .quantity(order.getQuantity())
                         .date(order.getOrderDate())
-                        .leadId(lead.getId())
-                        .kamId(kam.getId())
-                        .message("Order created successfully")
+                        .pocId(poc.getId())
+                        .pocName(poc.getName())
+                        .pocRole(poc.getRole())
+                        .message("Order created successfully with " + poc.getName())
                         .build();
             } else {
                 throw new BadRequestException("Only order interactions can be created using this endpoint");

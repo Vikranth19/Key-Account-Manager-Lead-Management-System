@@ -24,11 +24,11 @@ public class Order {
     private Integer quantity;
     private LocalDateTime orderDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lead_id", nullable = false)
     private Lead lead;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kam_id", nullable = false)
     private Kam kam;
 }

@@ -1,6 +1,7 @@
 package com.assignment.kam_lead_management_system.dto;
 
 import com.assignment.kam_lead_management_system.domain.InteractionType;
+import com.assignment.kam_lead_management_system.domain.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +21,9 @@ public class InteractionResponseDTO {
     private InteractionType type;
     private String details;
     private LocalDateTime date;
-    private Long leadId;
-    private Long kamId;
+    private Long pocId;
+    private String pocName;
+    private Role pocRole;
     private String message;
 
     // Order-specific response fields (Optional, only for type "Order")

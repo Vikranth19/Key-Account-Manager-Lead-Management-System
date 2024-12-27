@@ -3,15 +3,19 @@ package com.assignment.kam_lead_management_system.service;
 import com.assignment.kam_lead_management_system.domain.Kam;
 import com.assignment.kam_lead_management_system.domain.Lead;
 import com.assignment.kam_lead_management_system.domain.Status;
+import com.assignment.kam_lead_management_system.dto.LeadPerformanceDTO;
 import com.assignment.kam_lead_management_system.dto.LeadRequestDTO;
 import com.assignment.kam_lead_management_system.dto.LeadResponseDTO;
 import com.assignment.kam_lead_management_system.repository.KamRepository;
 import com.assignment.kam_lead_management_system.repository.LeadRepository;
+import com.assignment.kam_lead_management_system.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +26,8 @@ public class LeadService {
     private final KamRepository kamRepository;
 
     private final LeadRepository leadRepository;
+
+    private final OrderRepository orderRepository;
 
     @Transactional
     public LeadResponseDTO createLead(LeadRequestDTO leadRequestDto) {
@@ -101,6 +107,64 @@ public class LeadService {
                         .status(lead.getStatus())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public List<LeadPerformanceDTO> calculateLeadPerformance() {
+        // Fetch leads from the database
+        List<LeadPerformanceDTO> performanceDTOs = new ArrayList<>();
+
+        List<Lead> leads = leadRepository.findAll();
+
+        for (Lead lead : leads) {
+            long orderCount = orderRepository.countOrdersForLead(lead.getId());
+
+            LeadPerformanceDTO performanceDTO = LeadPerformanceDTO.builder()
+                    .leadId(lead.getId())
+                    .leadName(lead.getName())
+                    .leadStatus(lead.getStatus())
+                    .totalOrders(orderCount)
+                    .orderFrequency(orderCount)
+                    .build();
+
+            performanceDTOs.add(performanceDTO);
+        }
+        return performanceDTOs;
+    }
+
+    public List<LeadPerformanceDTO> getLeadsByPerformanceStatus(int orderThreshold, String performanceStatus) {
+        List<LeadPerformanceDTO> performanceDTOs = new ArrayList<>();
+
+        List<Lead> leads = leadRepository.findAll();
+
+        LocalDate startDate = LocalDate.now().minusDays(30);
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+
+        for (Lead lead : leads) {
+            long orderCount = orderRepository.countOrdersForLeadInLast30Days(lead.getId(), startDateTime);
+
+            LeadPerformanceDTO performanceDTO = buildLeadPerformanceDTO(lead, orderCount);
+
+            if (performanceStatus.equals("Well-Performing") && orderCount >= orderThreshold) {
+                performanceDTO.setPerformanceStatus("Well-Performing");
+                performanceDTOs.add(performanceDTO);
+            } else if (performanceStatus.equals("Under-Performing") && orderCount < orderThreshold) {
+                performanceDTO.setPerformanceStatus("Under-Performing");
+                performanceDTOs.add(performanceDTO);
+            }
+
+        }
+
+        return performanceDTOs;
+    }
+
+    private LeadPerformanceDTO buildLeadPerformanceDTO(Lead lead, long orderCount) {
+        return LeadPerformanceDTO.builder()
+                .leadId(lead.getId())
+                .leadName(lead.getName())
+                .leadStatus(lead.getStatus())
+                .totalOrders(orderCount)
+                .orderFrequency(orderCount)
+                .build();
     }
 
 }

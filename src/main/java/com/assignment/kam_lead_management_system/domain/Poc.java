@@ -23,7 +23,7 @@ public class Poc {
     private String contactInfo;
     private String email;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lead_id", nullable = false)
     private Lead lead;
 }

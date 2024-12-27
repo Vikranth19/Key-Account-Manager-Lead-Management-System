@@ -9,6 +9,7 @@ public class InteractionRequestDTO {
 
     private InteractionType type;
     private String details;
+    private Long pocId;
 
     // Order-specific fields (Optional, only for type "Order")
     private String orderDetails;

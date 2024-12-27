@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="restaurant_lead")
@@ -29,6 +31,10 @@ public class Lead {
     @ManyToOne
     @JoinColumn(name = "kam_id", nullable = false)
     private Kam kam;
+
+    @OneToMany(mappedBy = "lead", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Poc> pocs = new ArrayList<>();
 
     private Integer callFrequency;
     private LocalDateTime lastCallDate;

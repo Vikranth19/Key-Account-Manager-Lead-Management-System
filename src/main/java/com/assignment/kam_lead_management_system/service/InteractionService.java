@@ -30,12 +30,19 @@ public class InteractionService {
 
         Kam kam = lead.getKam();
 
+        // Validate the POC and ensure it belongs to the given Lead
+        Poc poc = lead.getPocs().stream()
+                .filter(p -> p.getId().equals(interactionRequestDTO.getPocId()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("POC is not associated with the lead"));
+
         Interaction interaction = Interaction.builder()
                 .type(interactionRequestDTO.getType())
                 .details(interactionRequestDTO.getDetails())
                 .date(LocalDateTime.now())
                 .lead(lead)
                 .kam(kam)
+                .poc(poc)
                 .build();
 
         if (InteractionType.ORDER.equals(interactionRequestDTO.getType())) {
@@ -47,6 +54,7 @@ public class InteractionService {
                     .kam(kam)
                     .build();
 
+            interaction.setOrder(order);
             orderRepository.save(order);
         }
 
@@ -60,7 +68,10 @@ public class InteractionService {
                 .type(interaction.getType())
                 .details(interaction.getDetails())
                 .date(interaction.getDate())
-                .message("Interaction recorded successfully")
+                .pocId(poc.getId())
+                .pocName(poc.getName())
+                .pocRole(poc.getRole())
+                .message("Interaction recorded successfully with " + poc.getName())
                 .build();
     }
 
@@ -72,6 +83,7 @@ public class InteractionService {
                 lead.setStatus(Status.CONTACTED);
             }
         } else if (interactionType == InteractionType.ORDER) {
+            //convert the lead status to converted if order is placed
             lead.setStatus(Status.CONVERTED);
         }
         leadRepository.save(lead);
@@ -85,10 +97,14 @@ public class InteractionService {
                         .type(interaction.getType())
                         .details(interaction.getDetails())
                         .date(interaction.getDate())
+                        .pocId(interaction.getPoc().getId())
+                        .pocName(interaction.getPoc().getName())
+                        .pocRole(interaction.getPoc().getRole())
                         .orderId(interaction.getOrder() != null ? interaction.getOrder().getId() : null)
                         .orderDetails(interaction.getOrder() != null ? interaction.getOrder().getOrderDetails() : null)
                         .quantity(interaction.getOrder() != null ? interaction.getOrder().getQuantity() : null)
                         .build())
                 .collect(Collectors.toList());
     }
+
 }

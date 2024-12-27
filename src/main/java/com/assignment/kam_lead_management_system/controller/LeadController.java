@@ -1,9 +1,6 @@
 package com.assignment.kam_lead_management_system.controller;
 
-import com.assignment.kam_lead_management_system.dto.LeadRequestDTO;
-import com.assignment.kam_lead_management_system.dto.LeadResponseDTO;
-import com.assignment.kam_lead_management_system.dto.PocRequestDTO;
-import com.assignment.kam_lead_management_system.dto.PocResponseDTO;
+import com.assignment.kam_lead_management_system.dto.*;
 import com.assignment.kam_lead_management_system.service.LeadService;
 import com.assignment.kam_lead_management_system.service.PocService;
 import lombok.RequiredArgsConstructor;
@@ -62,5 +59,20 @@ public class LeadController {
     public ResponseEntity<List<PocResponseDTO>> getPocsForLead(@PathVariable Long lead_id) {
         List<PocResponseDTO> pocs = pocService.getPocsForLead(lead_id);
         return new ResponseEntity<>(pocs, HttpStatus.OK);
+    }
+
+    @GetMapping("/performance")
+    public List<LeadPerformanceDTO> getLeadPerformance() {
+        return leadService.calculateLeadPerformance();
+    }
+
+    @GetMapping("/well-performing")
+    public List<LeadPerformanceDTO> getWellPerformingLeads() {
+        return leadService.getLeadsByPerformanceStatus(5, "Well-Performing");
+    }
+
+    @GetMapping("/under-performing")
+    public List<LeadPerformanceDTO> getUnderPerformingLeads() {
+        return leadService.getLeadsByPerformanceStatus(3, "Under-Performing");
     }
 }
