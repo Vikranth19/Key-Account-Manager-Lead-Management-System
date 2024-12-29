@@ -90,7 +90,12 @@ public class InteractionService {
     }
 
     public List<InteractionResponseDTO> getInteractionsForLead(Long leadId) {
+
+        leadRepository.findById(leadId)
+                .orElseThrow(() -> new RuntimeException("Lead not found"));
+
         List<Interaction> interactions = interactionRepository.findByLeadId(leadId);
+
         return interactions.stream()
                 .map(interaction -> InteractionResponseDTO.builder()
                         .id(interaction.getId())

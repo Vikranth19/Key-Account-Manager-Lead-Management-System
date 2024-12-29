@@ -44,6 +44,10 @@ public class PocService {
     }
 
     public List<PocResponseDTO> getPocsForLead(Long leadId) {
+
+        leadRepository.findById(leadId)
+                .orElseThrow(() -> new RuntimeException("Lead not found"));
+
         List<Poc> pocs = pocRepository.findByLeadId(leadId);
 
         return pocs.stream()

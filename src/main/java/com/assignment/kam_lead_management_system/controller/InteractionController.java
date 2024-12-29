@@ -5,6 +5,7 @@ import com.assignment.kam_lead_management_system.dto.InteractionResponseDTO;
 import com.assignment.kam_lead_management_system.service.InteractionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class InteractionController {
     private final InteractionService interactionService;
 
     @PostMapping
+    @PreAuthorize("(hasRole('KAM') and @commonUtils.getKamIdFromAuthentication() == @leadService.getKamIdForLead(#lead_id))")
     public ResponseEntity<InteractionResponseDTO> recordInteraction(
             @PathVariable Long lead_id,
             @RequestBody InteractionRequestDTO request) {
@@ -25,6 +27,7 @@ public class InteractionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('KAM') and @commonUtils.getKamIdFromAuthentication() == @leadService.getKamIdForLead(#lead_id))")
     public ResponseEntity<List<InteractionResponseDTO>> getInteractionsForLead(@PathVariable Long lead_id) {
         List<InteractionResponseDTO> interactions = interactionService.getInteractionsForLead(lead_id);
         return ResponseEntity.ok(interactions);

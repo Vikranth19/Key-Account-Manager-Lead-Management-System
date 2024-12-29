@@ -94,11 +94,15 @@ public class LeadService {
             lead.setLastCallDate(leadRequestDto.getLastCallDate());
         }
 
+        if(leadRequestDto.getAddress() != null){
+            lead.setLocation(leadRequestDto.getAddress());
+        }
+
         leadRepository.save(lead);
     }
 
-    public List<LeadResponseDTO> getLeadsRequiringCallToday() {
-        List<Lead> leads = leadRepository.findLeadsRequiringCallToday(LocalDateTime.now());
+    public List<LeadResponseDTO> getLeadsRequiringCallToday(Long kamId) {
+        List<Lead> leads = leadRepository.findLeadsRequiringCallToday(LocalDateTime.now(), kamId);
 
         return leads.stream()
                 .map(lead -> LeadResponseDTO.builder()
@@ -107,6 +111,17 @@ public class LeadService {
                         .status(lead.getStatus())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void reassignLeadToKam(Long leadId, Long newKamId) {
+        Lead lead = leadRepository.findById(leadId)
+                .orElseThrow(() -> new RuntimeException("Lead not found"));
+        Kam newKam = kamRepository.findById(newKamId)
+                .orElseThrow(() -> new RuntimeException("KAM not found"));
+
+        lead.setKam(newKam);
+        leadRepository.save(lead);
     }
 
     public List<LeadPerformanceDTO> calculateLeadPerformance() {
@@ -166,5 +181,11 @@ public class LeadService {
                 .orderFrequency(orderCount)
                 .build();
     }
+
+    public Long getKamIdForLead(Long leadId) {
+        Lead lead = leadRepository.findById(leadId).orElseThrow(() -> new RuntimeException("Lead not found"));
+        return lead.getKam() != null ? lead.getKam().getId() : null;
+    }
+
 
 }

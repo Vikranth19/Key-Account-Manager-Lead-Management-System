@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface KamRepository extends JpaRepository<Kam, Long> {
 
+    Optional<Kam> findByUsername(String username);
+
 }
