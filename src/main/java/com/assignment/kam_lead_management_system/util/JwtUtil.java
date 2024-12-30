@@ -1,7 +1,6 @@
 package com.assignment.kam_lead_management_system.util;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -20,8 +19,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.security.KeyRep.Type.SECRET;
-
 @Component
 public class JwtUtil implements Serializable {
 
@@ -38,23 +35,10 @@ public class JwtUtil implements Serializable {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    public Date getIssuedAtDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getIssuedAt);
-    }
-
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-//    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-//        final Claims claims = getAllClaimsFromToken(token);
-//        return claimsResolver.apply(claims);
-//    }
-//
-//    private Claims getAllClaimsFromToken(String token) {
-//        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secret).build().parseSignedClaims(token);
-//        return claimsJws.getBody();
-//    }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
@@ -72,11 +56,6 @@ public class JwtUtil implements Serializable {
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
-    }
-
-    private Boolean ignoreTokenExpiration(String token) {
-        // here you specify tokens, for that the expiration is ignored
-        return false;
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -102,11 +81,6 @@ public class JwtUtil implements Serializable {
     private SecretKey getSignKey() {
          byte[] keyBytes = Decoders.BASE64.decode(secret);
          return Keys.hmacShaKeyFor(keyBytes);
-//        return Jwts.SIG.HS256.key().build();
-    }
-
-    public Boolean canTokenBeRefreshed(String token) {
-        return (!isTokenExpired(token) || ignoreTokenExpiration(token));
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

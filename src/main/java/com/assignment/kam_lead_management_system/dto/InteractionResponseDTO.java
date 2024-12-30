@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class InteractionResponseDTO {
     private Long id;
     private InteractionType type;
     private String details;
-    private LocalDateTime date;
+    private Instant date;
     private Long pocId;
     private String pocName;
     private Role pocRole;

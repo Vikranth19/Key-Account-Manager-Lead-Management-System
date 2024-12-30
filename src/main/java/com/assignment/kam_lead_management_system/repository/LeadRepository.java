@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 public interface LeadRepository extends JpaRepository<Lead, Long> {
@@ -19,7 +19,8 @@ public interface LeadRepository extends JpaRepository<Lead, Long> {
     @Query("SELECT l FROM Lead l " +
             "WHERE l.callFrequency IS NOT NULL " +
             "AND (l.status = 'NEW' " +
-            "OR (l.status = 'CONTACTED' AND DATEDIFF(CURRENT_DATE, l.lastCallDate) >= l.callFrequency))" +
+            "OR (l.status = 'CONTACTED' AND TIMESTAMPDIFF(DAY, l.lastCallDate, :now) >= l.callFrequency)) " +
             "AND (l.kam.id = :kamId OR :kamId IS NULL)")
-    List<Lead> findLeadsRequiringCallToday(LocalDateTime now, @Param("kamId") Long kamId);
+    List<Lead> findLeadsRequiringCallToday(@Param("now") Instant now, @Param("kamId") Long kamId);
+
 }

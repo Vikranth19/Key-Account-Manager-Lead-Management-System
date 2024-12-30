@@ -13,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -102,7 +102,7 @@ public class LeadService {
     }
 
     public List<LeadResponseDTO> getLeadsRequiringCallToday(Long kamId) {
-        List<Lead> leads = leadRepository.findLeadsRequiringCallToday(LocalDateTime.now(), kamId);
+        List<Lead> leads = leadRepository.findLeadsRequiringCallToday(Instant.now().truncatedTo(ChronoUnit.SECONDS), kamId);
 
         return leads.stream()
                 .map(lead -> LeadResponseDTO.builder()
@@ -151,11 +151,10 @@ public class LeadService {
 
         List<Lead> leads = leadRepository.findAll();
 
-        LocalDate startDate = LocalDate.now().minusDays(30);
-        LocalDateTime startDateTime = startDate.atStartOfDay();
+        Instant startDate = Instant.now().minus(30, ChronoUnit.DAYS);
 
         for (Lead lead : leads) {
-            long orderCount = orderRepository.countOrdersForLeadInLast30Days(lead.getId(), startDateTime);
+            long orderCount = orderRepository.countOrdersForLeadInLast30Days(lead.getId(), startDate);
 
             LeadPerformanceDTO performanceDTO = buildLeadPerformanceDTO(lead, orderCount);
 

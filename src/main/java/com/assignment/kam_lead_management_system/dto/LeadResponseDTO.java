@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -23,6 +23,6 @@ public class LeadResponseDTO {
     private Long assignedKamId;
     private Integer callFrequency;
     private String message;
-    private LocalDateTime lastCallDate;
+    private Instant lastCallDate;
 
 }

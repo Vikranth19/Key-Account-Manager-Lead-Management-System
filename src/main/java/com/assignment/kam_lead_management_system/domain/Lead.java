@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +37,6 @@ public class Lead {
     private List<Poc> pocs = new ArrayList<>();
 
     private Integer callFrequency;
-    private LocalDateTime lastCallDate;
+    private Instant lastCallDate;
 }
 

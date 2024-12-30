@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name="interaction")
@@ -23,7 +23,7 @@ public class Interaction {
     private InteractionType type;
 
     private String details;
-    private LocalDateTime date;
+    private Instant date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lead_id", nullable = false)
@@ -32,10 +32,6 @@ public class Interaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kam_id", nullable = false)
     private Kam kam;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poc_id")

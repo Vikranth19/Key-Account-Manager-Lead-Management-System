@@ -9,7 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ public class OrderService {
     public InteractionResponseDTO createOrder(Long leadId, InteractionRequestDTO interactionRequestDTO) {
 
         InteractionResponseDTO interactionResponseDTO = null;
+
         try {
             Lead lead = leadRepository.findById(leadId)
                     .orElseThrow(() -> new RuntimeException("Lead not found with id {}" + leadId));
@@ -41,7 +43,7 @@ public class OrderService {
                 Order order = Order.builder()
                         .orderDetails(interactionRequestDTO.getOrderDetails())
                         .quantity(interactionRequestDTO.getQuantity())
-                        .orderDate(LocalDateTime.now())
+                        .orderDate(Instant.now().truncatedTo(ChronoUnit.SECONDS))
                         .lead(lead)
                         .kam(kam)
                         .build();
