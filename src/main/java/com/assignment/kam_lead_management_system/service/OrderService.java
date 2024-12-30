@@ -46,6 +46,7 @@ public class OrderService {
                     .orderDate(Instant.now().truncatedTo(ChronoUnit.SECONDS))
                     .lead(lead)
                     .kam(kam)
+                    .poc(poc)
                     .build();
 
             orderRepository.save(order);

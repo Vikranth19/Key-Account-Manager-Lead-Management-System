@@ -39,7 +39,12 @@ public class SecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                         authorizeHttpRequests
                                 .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR).permitAll()
-                                .requestMatchers("/api/auth/signup", "/api/auth/login").permitAll()
+                                .requestMatchers(
+                                        "/api/auth/signup",
+                                        "/api/auth/login",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html").permitAll()
                                 .anyRequest().authenticated()
                 ).
                 sessionManagement(sessionManagement ->

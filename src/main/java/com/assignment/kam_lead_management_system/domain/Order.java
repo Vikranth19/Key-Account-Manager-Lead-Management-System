@@ -31,4 +31,8 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "kam_id", nullable = false)
     private Kam kam;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "poc_id")
+    private Poc poc;
 }

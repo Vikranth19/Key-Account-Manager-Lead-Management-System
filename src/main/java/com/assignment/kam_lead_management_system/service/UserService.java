@@ -3,13 +3,20 @@ package com.assignment.kam_lead_management_system.service;
 import com.assignment.kam_lead_management_system.domain.Kam;
 import com.assignment.kam_lead_management_system.domain.Role;
 import com.assignment.kam_lead_management_system.domain.User;
+import com.assignment.kam_lead_management_system.dto.AuthCredentialsRequestDTO;
 import com.assignment.kam_lead_management_system.dto.UserResponseDTO;
 import com.assignment.kam_lead_management_system.dto.UserSignupRequestDTO;
 import com.assignment.kam_lead_management_system.exception.KamCustomException;
 import com.assignment.kam_lead_management_system.repository.KamRepository;
 import com.assignment.kam_lead_management_system.repository.UserRepository;
+import com.assignment.kam_lead_management_system.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +28,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final KamRepository kamRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public UserResponseDTO signupUser(UserSignupRequestDTO userRequestDTO) {
@@ -60,6 +69,22 @@ public class UserService {
                 .role(user.getRole())
                 .message(user.getRole() + " created successfully")
                 .build();
+    }
+
+    public String loginUser(AuthCredentialsRequestDTO authCredentialsRequestDTO){
+        try {
+            Authentication authenticate = authenticationManager
+                    .authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    authCredentialsRequestDTO.getUsername(), authCredentialsRequestDTO.getPassword()));
+
+            User user = (User) authenticate.getPrincipal();
+            user.setPassword(null);
+
+            return jwtUtil.generateToken(user);
+        } catch (BadCredentialsException ex) {
+            throw new KamCustomException("Invalid credentials", HttpStatus.UNAUTHORIZED);
+        }
     }
 
 }

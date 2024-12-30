@@ -1,19 +1,18 @@
 package com.assignment.kam_lead_management_system.controller;
 
-import com.assignment.kam_lead_management_system.domain.User;
 import com.assignment.kam_lead_management_system.dto.AuthCredentialsRequestDTO;
+import com.assignment.kam_lead_management_system.dto.ErrorResponseDTO;
 import com.assignment.kam_lead_management_system.dto.UserResponseDTO;
 import com.assignment.kam_lead_management_system.dto.UserSignupRequestDTO;
 import com.assignment.kam_lead_management_system.service.UserService;
-import com.assignment.kam_lead_management_system.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,34 +25,29 @@ public class AuthController {
 
     private final UserService userService;
 
-    private final AuthenticationManager authenticationManager;
-
-    private final JwtUtil jwtUtil;
-
     @PostMapping("/signup")
+    @Operation(
+            description = "User sign up - KAM/ADMIN",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "User successfully created. The response contains the details of the newly created user.", content = @Content(schema = @Schema(implementation = UserResponseDTO.class))),
+                    @ApiResponse(responseCode = "409", description = "Conflict if the username already exists.", content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
+            })
     public ResponseEntity<UserResponseDTO> signupUser(@RequestBody UserSignupRequestDTO userRequestDTO) {
         UserResponseDTO userResponseDTO = userService.signupUser(userRequestDTO);
         return new ResponseEntity<>(userResponseDTO, HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthCredentialsRequestDTO request) {
-        try {
-            Authentication authenticate = authenticationManager
-                    .authenticate(
-                            new UsernamePasswordAuthenticationToken(
-                                    request.getUsername(), request.getPassword()));
-
-            User user = (User) authenticate.getPrincipal();
-            user.setPassword(null);
-
-            String token = jwtUtil.generateToken(user);
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.AUTHORIZATION, token)
-                    .body(user);
-        } catch (BadCredentialsException ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    @Operation(
+            description = "User log in to obtain JWT token for accessing protected resources.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User successfully authenticated. The response contains JWT token in the response header."),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized. Incorrect username or password.", content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+            })
+    public ResponseEntity<String> login(@RequestBody AuthCredentialsRequestDTO request) {
+        String token = userService.loginUser(request);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .body("User logged in successfully");
     }
 }
