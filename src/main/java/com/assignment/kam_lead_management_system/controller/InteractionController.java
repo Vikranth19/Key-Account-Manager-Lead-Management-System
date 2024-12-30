@@ -2,7 +2,6 @@ package com.assignment.kam_lead_management_system.controller;
 
 import com.assignment.kam_lead_management_system.dto.InteractionRequestDTO;
 import com.assignment.kam_lead_management_system.dto.InteractionResponseDTO;
-import com.assignment.kam_lead_management_system.dto.PocRequestDTO;
 import com.assignment.kam_lead_management_system.service.InteractionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("api/leads/{lead_id}/interactions")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class InteractionController {
 
     private final InteractionService interactionService;
