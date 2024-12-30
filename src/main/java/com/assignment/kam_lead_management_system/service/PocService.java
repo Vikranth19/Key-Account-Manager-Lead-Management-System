@@ -4,9 +4,11 @@ import com.assignment.kam_lead_management_system.domain.Lead;
 import com.assignment.kam_lead_management_system.domain.Poc;
 import com.assignment.kam_lead_management_system.dto.PocRequestDTO;
 import com.assignment.kam_lead_management_system.dto.PocResponseDTO;
+import com.assignment.kam_lead_management_system.exception.KamCustomException;
 import com.assignment.kam_lead_management_system.repository.LeadRepository;
 import com.assignment.kam_lead_management_system.repository.PocRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +25,7 @@ public class PocService {
     public PocResponseDTO addPocToLead(Long leadId, PocRequestDTO pocRequestDto) {
         // Validate if lead exists
         Lead lead = leadRepository.findById(leadId)
-                .orElseThrow(() -> new RuntimeException("Lead not found"));
+                .orElseThrow(() -> new KamCustomException("Lead not found", HttpStatus.NOT_FOUND));
 
         Poc poc = Poc.builder()
                 .name(pocRequestDto.getName())
@@ -46,7 +48,7 @@ public class PocService {
     public List<PocResponseDTO> getPocsForLead(Long leadId) {
 
         leadRepository.findById(leadId)
-                .orElseThrow(() -> new RuntimeException("Lead not found"));
+                .orElseThrow(() -> new KamCustomException("Lead not found", HttpStatus.NOT_FOUND));
 
         List<Poc> pocs = pocRepository.findByLeadId(leadId);
 

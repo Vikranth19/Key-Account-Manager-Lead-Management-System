@@ -6,10 +6,12 @@ import com.assignment.kam_lead_management_system.domain.Status;
 import com.assignment.kam_lead_management_system.dto.LeadPerformanceDTO;
 import com.assignment.kam_lead_management_system.dto.LeadRequestDTO;
 import com.assignment.kam_lead_management_system.dto.LeadResponseDTO;
+import com.assignment.kam_lead_management_system.exception.KamCustomException;
 import com.assignment.kam_lead_management_system.repository.KamRepository;
 import com.assignment.kam_lead_management_system.repository.LeadRepository;
 import com.assignment.kam_lead_management_system.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +34,7 @@ public class LeadService {
     @Transactional
     public LeadResponseDTO createLead(LeadRequestDTO leadRequestDto) {
         Kam kam = kamRepository.findById(leadRequestDto.getAssignedKamId())
-                .orElseThrow(() -> new RuntimeException("Key Account Manager not found"));
+                .orElseThrow(() -> new KamCustomException("Key Account Manager not found", HttpStatus.NOT_FOUND));
 
         Lead lead = Lead.builder().
                 name(leadRequestDto.getName()).
@@ -80,7 +82,7 @@ public class LeadService {
     @Transactional
     public void updateLead(Long id, LeadRequestDTO leadRequestDto) {
         Lead lead = leadRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Lead with requested Id not found"));
+                .orElseThrow(() -> new KamCustomException("Lead with requested Id not found", HttpStatus.NOT_FOUND));
 
         if (leadRequestDto.getStatus() != null) {
             lead.setStatus(leadRequestDto.getStatus());
@@ -116,9 +118,9 @@ public class LeadService {
     @Transactional
     public void reassignLeadToKam(Long leadId, Long newKamId) {
         Lead lead = leadRepository.findById(leadId)
-                .orElseThrow(() -> new RuntimeException("Lead not found"));
+                .orElseThrow(() -> new KamCustomException("Lead not found", HttpStatus.NOT_FOUND));
         Kam newKam = kamRepository.findById(newKamId)
-                .orElseThrow(() -> new RuntimeException("KAM not found"));
+                .orElseThrow(() -> new KamCustomException("KAM not found", HttpStatus.NOT_FOUND));
 
         lead.setKam(newKam);
         leadRepository.save(lead);
@@ -182,7 +184,7 @@ public class LeadService {
     }
 
     public Long getKamIdForLead(Long leadId) {
-        Lead lead = leadRepository.findById(leadId).orElseThrow(() -> new RuntimeException("Lead not found"));
+        Lead lead = leadRepository.findById(leadId).orElseThrow(() -> new KamCustomException("Lead not found", HttpStatus.NOT_FOUND));
         return lead.getKam() != null ? lead.getKam().getId() : null;
     }
 
