@@ -77,6 +77,27 @@ The KAM Lead Management System is a comprehensive platform designed for Key Acco
   - **Authorized Role:** ADMIN
   - **API:** GET /api/leads/under-performing
   - **Description:** Identify accounts that are not meeting expected order threshold.
+
+Summary of Authorization:
+
+|                           Feature	Endpoint                           |        Admin         |        KAM        |
+|:--------------------------------------------------------------------:|:---------------:|:-----------------:|
+|             View all key account managers	GET /api/kams              | ✅ |         ❌         |
+|                    Add New Leads	POST /api/leads                     | ✅ |         ❌         |
+|                      View Leads	GET /api/leads                       |    ✅     | ✅ (assigned only) |
+|             Update Lead Information	PUT /api/leads/{id}              |    ✅     |         ❌         |
+|  Reassign KAM for a lead	PUT /api/leads/{id}/reassign?newKamId={id}  |    ✅     |         ❌         |
+|               Add POCs	POST /api/leads/{lead_id}/pocs                |    ✅     |         ❌         |
+|               View POCs	GET /api/leads/{lead_id}/pocs                |    ✅     | ✅ (assigned only) |
+| View Leads Requiring Calls Today	GET /api/leads/requiring-call-today |    ✅     |         ✅         |
+|      Record Interactions	POST /api/leads/{lead_id}/interactions      |    ❌     |         ✅         |
+|       View Interactions	GET /api/leads/{lead_id}/interactions        |    ✅     |         ✅         |
+|            Create Order	POST /api/leads/{lead_id}/orders             |    ❌     |         ✅         |
+|             View Orders	GET /api/leads/{lead_id}/orders              |    ✅     |         ✅         |
+|         Monitor Ordering Patterns	GET /api/leads/performance         |    ✅     |         ❌         |
+|    Track Well-Performing Accounts	GET /api/leads/well-performing     |    ✅     |         ❌         |
+|  Identify Underperforming Accounts	GET /api/leads/under-performing   |    ✅     |         ❌         |
+
   
 ### ER diagram for KAM lead management system
 Diagram
