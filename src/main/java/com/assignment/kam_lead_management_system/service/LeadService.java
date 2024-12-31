@@ -10,6 +10,9 @@ import com.assignment.kam_lead_management_system.exception.KamCustomException;
 import com.assignment.kam_lead_management_system.repository.KamRepository;
 import com.assignment.kam_lead_management_system.repository.LeadRepository;
 import com.assignment.kam_lead_management_system.repository.OrderRepository;
+import com.assignment.kam_lead_management_system.strategy.PerformanceStrategy;
+import com.assignment.kam_lead_management_system.strategy.UnderPerformingStrategy;
+import com.assignment.kam_lead_management_system.strategy.WellPerformingStrategy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -150,24 +153,28 @@ public class LeadService {
 
     public List<LeadPerformanceDTO> getLeadsByPerformanceStatus(int orderThreshold, String performanceStatus) {
         List<LeadPerformanceDTO> performanceDTOs = new ArrayList<>();
-
         List<Lead> leads = leadRepository.findAll();
-
         Instant startDate = Instant.now().minus(30, ChronoUnit.DAYS);
+
+        PerformanceStrategy strategy;
+
+        // Decide which strategy to use based on the performanceStatus
+        if ("Well-Performing".equals(performanceStatus)) {
+            strategy = new WellPerformingStrategy();
+        } else if ("Under-Performing".equals(performanceStatus)) {
+            strategy = new UnderPerformingStrategy();
+        } else {
+            throw new IllegalArgumentException("Invalid performance status: " + performanceStatus);
+        }
 
         for (Lead lead : leads) {
             long orderCount = orderRepository.countOrdersForLeadInLast30Days(lead.getId(), startDate);
-
             LeadPerformanceDTO performanceDTO = buildLeadPerformanceDTO(lead, orderCount);
 
-            if (performanceStatus.equals("Well-Performing") && orderCount >= orderThreshold) {
-                performanceDTO.setPerformanceStatus("Well-Performing");
-                performanceDTOs.add(performanceDTO);
-            } else if (performanceStatus.equals("Under-Performing") && orderCount < orderThreshold) {
-                performanceDTO.setPerformanceStatus("Under-Performing");
+            if (strategy.evaluate(orderCount, orderThreshold)) {
+                performanceDTO.setPerformanceStatus(strategy.getPerformanceStatus());
                 performanceDTOs.add(performanceDTO);
             }
-
         }
 
         return performanceDTOs;
