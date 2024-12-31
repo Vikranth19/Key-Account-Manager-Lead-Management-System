@@ -89,11 +89,11 @@ Summary of Authorization:
 |  Reassign KAM for a lead	PUT /api/leads/{id}/reassign?newKamId={id}  |    ✅     |         ❌         |
 |               Add POCs	POST /api/leads/{lead_id}/pocs                |    ✅     |         ❌         |
 |               View POCs	GET /api/leads/{lead_id}/pocs                |    ✅     | ✅ (assigned only) |
-| View Leads Requiring Calls Today	GET /api/leads/requiring-call-today |    ✅     |         ✅         |
+| View Leads Requiring Calls Today	GET /api/leads/requiring-call-today |    ✅     |         ✅(assigned only)         |
 |      Record Interactions	POST /api/leads/{lead_id}/interactions      |    ❌     |         ✅         |
-|       View Interactions	GET /api/leads/{lead_id}/interactions        |    ✅     |         ✅         |
+|       View Interactions	GET /api/leads/{lead_id}/interactions        |    ✅     |         ✅(assigned only)         |
 |            Create Order	POST /api/leads/{lead_id}/orders             |    ❌     |         ✅         |
-|             View Orders	GET /api/leads/{lead_id}/orders              |    ✅     |         ✅         |
+|             View Orders	GET /api/leads/{lead_id}/orders              |    ✅     |         ✅ (assigned only)        |
 |         Monitor Ordering Patterns	GET /api/leads/performance         |    ✅     |         ❌         |
 |    Track Well-Performing Accounts	GET /api/leads/well-performing     |    ✅     |         ❌         |
 |  Identify Underperforming Accounts	GET /api/leads/under-performing   |    ✅     |         ❌         |
