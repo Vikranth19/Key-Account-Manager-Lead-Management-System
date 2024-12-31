@@ -33,6 +33,6 @@ public class Order {
     private Kam kam;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "poc_id")
+    @JoinColumn(name = "poc_id", nullable = false)
     private Poc poc;
 }
